@@ -1,11 +1,217 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
-    version: '1.0.0'
-    title: 'E-Commerce API'
-    description: 'API for managing brands, products, and user cart'
-host: 'localhost:3000'
+  title: Sunglasses API
+  description: API for Sunglasses Store
+  version: "1.0.0"
+host: localhost:3001
 schemes:
-    - 'http'
-basePath: '/api'
+  - https
+basePath: /
 produces:
-    - 'application/json'
+  - application/json
+paths:
+  /api/brands:
+    get:
+      summary: Get Sunglasses Brands
+      description: Retrieve a list of sunglasses brands.
+      parameters:
+        - name: query
+          in: query
+          description: Search query string
+          type: string
+      responses:
+        "200":
+          description: An array of sunglasses brands
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Unique identifier for the brand
+                name:
+                  type: string
+                  description: The name of the brand
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /api/brands/{id}/products:
+    get:
+      summary: Get Brand Products
+      description: Retrieve all products of a specific brand.
+      parameters:
+        - name: id
+          in: path
+          description: Brand ID
+          required: true
+          type: string
+      responses:
+        "200":
+          description: An array of products for the brand
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /api/products:
+    get:
+      summary: Get All Products
+      description: Retrieve all sunglasses products.
+      parameters:
+        - name: query
+          in: query
+          description: Search query string
+          type: string
+      responses:
+        "200":
+          description: An array of all products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /api/login:
+    post:
+      summary: User Login
+      description: Authenticate user and return access token.
+      parameters:
+        - name: username
+          in: query
+          description: User's username
+          required: true
+          type: string
+        - name: password
+          in: query
+          description: User's password
+          required: true
+          type: string
+      responses:
+        "200":
+          description: User authentication successful
+          schema:
+            $ref: '#/definitions/User'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /api/me/cart:
+    get:
+      summary: Get User Cart
+      description: Retrieve user's shopping cart.
+      responses:
+        "200":
+          description: An array of items in the user's cart
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+    post:
+      summary: Add Product to Cart
+      description: Add a product to the user's shopping cart.
+      parameters:
+        - name: product
+          in: body
+          description: Product object to add to cart
+          required: true
+          schema:
+            $ref: '#/definitions/Product'
+      responses:
+        "200":
+          description: Product added to cart successfully
+          schema:
+            $ref: '#/definitions/User'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+  /api/me/cart/{productId}:
+    delete:
+      summary: Remove Product from Cart
+      description: Remove a product from the user's shopping cart.
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to remove from the cart
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Product removed from cart successfully
+          schema:
+            $ref: '#/definitions/User'
+        "default":
+          description: Unexpected error
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+definitions:
+  Product:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the product
+      categoryId:
+        type: string
+        description: The brand ID that the product belongs to
+      description:
+        type: string
+        description: Description of the product
+      price:
+        type: integer
+        description: Price of the product
+      imageURL:
+        type: string
+        description: URL for the product image
+
+  User:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the user
+      username:
+        type: string
+        description: User's username
+      accessToken:
+        type: string
+        description: Access token for user authentication
